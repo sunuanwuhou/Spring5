@@ -105,10 +105,9 @@ public class InvocationHandlerImpl implements InvocationHandler {
 
     public static void main(String[] args) {
         UserService userServiceImpl = new UserServiceImpl();
-        InvocationHandlerImpl invocationHandler = new InvocationHandlerImpl(userServiceImpl);
         ClassLoader loader = userServiceImpl.getClass().getClassLoader();
         Class[] interfaces = userServiceImpl.getClass().getInterfaces();
-        UserService userService = (UserService) Proxy.newProxyInstance(loader, interfaces, invocationHandler);
+        UserService userService = (UserService) Proxy.newProxyInstance(loader, interfaces, new InvocationHandlerImpl(userServiceImpl));
         userService.login();
 
     }
@@ -140,11 +139,47 @@ public class MyMethodInterceptor implements MethodInterceptor {
 }
 ```
   
-2.
+## 术语
 
+1.连接点
+类里哪里方法可以被增强，这些方法称为连接点
+2.切入点
+实际被真正增强的方法，称为切入点
+3.通知
+    实际增强逻辑的部分称为通知
+    前置通知
+    后置通知
+    环绕通知
+    异常通知
+    最终通知
+4.切面
+把通知应用到切入点过程
 
+## AOP操作
 
+1.Spring一般都是基于AsprctJ实现AOP操作
 
+2.切入点表达式
+execution(<修饰符模式>?<返回类型模式><方法名模式>(<参数模式>)<异常模式>?)
+https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#aop-ataspectj
+```java
+@Aspect
+@Configuration
+public class UserProxy {
+    @Pointcut("execution(* com.example.springBoot.AOP.User.add(..))")
+    public void pointCont(){ }
+    @Before(value = "pointCont()")
+    //不管有没有异常都会执行
+    @After(value = "pointCont()")
+    //方法before之前和after之前都执行
+    @Around(value = "pointCont()")
+    @AfterReturning(value = "pointCont()")
+    @AfterThrowing(value = "pointCont()")
+    public void before(){
+        System.out.println("before");
+    }
+}
+```
 # 4.JdbcTemplate
 
 # 5.事务
